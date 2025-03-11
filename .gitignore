@@ -2,3 +2,5 @@
 *.json
 out/
 results/
+__pycache__/
+venv/
