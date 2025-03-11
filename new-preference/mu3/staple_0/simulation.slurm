@@ -3,12 +3,12 @@
 # Running an array of search algorithm with random seeds 
 
 #SBATCH --array=0-499             # there is a max array size - 500 tasks
-#SBATCH -J sim 
+#SBATCH -J mu3_sim 
 #SBATCH --nodelist=yen17          # to be reproducible, fix the node to run simulation on
 #SBATCH -p normal 
 #SBATCH -n 1
 #SBATCH -c 1                              # one core per task
-#SBATCH -t 2- 
+#SBATCH -t 1-
 #SBATCH -o out/sim-%a.out
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=user@stanford.edu

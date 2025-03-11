@@ -20,7 +20,7 @@ python simulation-one-seed.py 0
 ```
 
 Author: Natalya Rapstine 
-Modified: Sep. 27, 2024
+Modified: Dec. 10, 2024
 """
 
 import os, sys, json, time
@@ -61,24 +61,31 @@ np.random.seed(seed_num)
 print(f"Starting simulation for {seed_num:05} seed...")
 
 # simulation with fixed seed
-# Parameters for Brownian staple : {psi0, mu1, mu2, sigma0^2}
+# Parameters for Brownian staple : {psi0, mu1, mu2, mu3, sigma0^2}
 # change this for psi0 < 0, mu1 > 0, mu2 > 0 :
-staple = [-0.6, 1, 0.99, 0.5]
+staple = [-0.6, 1, 0.99, 1, 0.5]
 
 # lists to store histories and outcome
 history, novelhistory, outcome, frontier = [], [], [], []
 history_dict = {}
 derivative_history = {}
-    
+
 # x, y grids
 xgrid = [0]
 ygrid = [0]
   
 # error tolerance 
-eps = 10 ** (-5)
- 
+eps = 10 ** (-6)
+print(f'eps: {eps}')
+
+num_points = 300
+print(f'num_points: {num_points}') 
+
 # max iter number 
 maxiter = 500
+
+boundary_addition = 0.3
+print(f'boundary_addition: {boundary_addition}')
 
 # Main dictionary to store all the results
 sim_results = {}
@@ -94,19 +101,19 @@ for i in range(maxiter):
     min_y = min(ygrid)
     max_x = max(xgrid)
     max_y = max(ygrid)
-    
+
     if min_x == max_x:
-        max_x = min_x + 0.3
+        max_x = min_x + boundary_addition
     else:
-        max_x += 0.3
-        
+        max_x += boundary_addition
+
     if min_y == max_y:
-        max_y = min_y + 0.3
+        max_y = min_y + boundary_addition
     else:
-        max_y += 0.3
- 
+        max_y += boundary_addition
+    
     # run optimization with different initial points and choose the optima
-    initial_points = generate_initial_points(startx=min_x, endx=max_x, starty=min_y, endy=max_y)
+    initial_points = generate_initial_points(startx=min_x, endx=max_x, starty=min_y, endy=max_y, num_points=num_points)
     novelpoint = find_global_minima(history, outcome, staple, preference_func, ivm, initial_points)[1]
     novelpoint = adjust_round_error(novelpoint, xgrid, ygrid, eps)
     
@@ -148,10 +155,9 @@ for i in range(maxiter):
         # plot_current_state(novelpoint, history, derivative_points, i, seed_num)
         history.extend(searchpoints)
         if derivative_points:
-            derivative_history[i] = derivative_points
-            # derivative_history.extend(derivative_points)
+           derivative_history[i] = derivative_points
         history_dict[i] = searchpoints
- 
+        
 # there is a repeat point, so now we check CONDITION 1
 # Find the minimum absolute difference from 0 for all points' outcome
 abs_differences = [abs(o - 0.0) for o in outcome]

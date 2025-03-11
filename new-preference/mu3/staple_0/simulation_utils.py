@@ -19,7 +19,7 @@ Utility functions the main simulation script uses.
 - `generate_initial_points`: Generates a grid of initial points in a specified 2D region.
 
 Author: Natalya Rapstine
-Modified: Apr. 8, 2024
+Modified: Dec. 10, 2024
 """
 
 import os 
@@ -83,7 +83,7 @@ def cov(point1, point2, staple):
     Covariance between two points.
     point (x, y) is a tuple 
     """
-    return min(point1[0], point2[0]) + min(point1[1], point2[1]) + staple[3] * min(point1[0], point2[0]) * min(point1[1], point2[1])
+    return min(point1[0], point2[0]) + min(point1[1], point2[1]) + staple[4] * min(point1[0], point2[0]) * min(point1[1], point2[1])
 
 def var_mat(points, staple):
     """
@@ -155,20 +155,23 @@ def condit_var(points, history, staple, ivm):
     
     return condit_var
 
-
 def mean_vect(points, staple):
     """
-    points is a list of tuples (x, y) points [(x0, y0), (x1, y1), (x2, y2), ...] and staple is a list
-    
+    points is a list of tuples (x, y) points [(x0, y0), (x1, y1), (x2, y2), ...]
+    and staple is a list with parameters including mu3
+
     return list of mean values of length N_points -- same as len(points)
     """
-    
     if points:
-        return staple[0] + staple[1] * np.array( [p[0] for p in points]) + staple[2] * np.array( [p[1] for p in points])
-    
+        x = np.array([p[0] for p in points])
+        y = np.array([p[1] for p in points])
+        mu1 = staple[1]
+        mu2 = staple[2]
+        mu3 = staple[3]
+        
+        return staple[0] + mu1 * x + mu2 * y + mu3 * x * y
     else:
         return 0.0
-
 
 def condit_mean(points, history, outcome, staple, ivm):
     """
